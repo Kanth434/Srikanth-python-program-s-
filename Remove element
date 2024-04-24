@@ -1,0 +1,8 @@
+
+def remove_element(lst, element):
+    return [value for value in lst if value != element]
+
+my_list = [1, 2, 3, 4, 5]
+element_to_remove = 3
+updated_list = remove_element(my_list, element_to_remove)
+print(updated_list)
