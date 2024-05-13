@@ -1,0 +1,21 @@
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+
+def factors(n):
+    factors_list = []
+    for i in range(1, n + 1):
+        if n % i == 0:
+            factors_list.append(i)
+    return factors_list
+
+n = 5
+m = 10
+
+n_factorial = factorial(n)
+m_factors = factors(m)
+
+print(f"{n} factorial is: {n_factorial}")
+print(f"{m} factors are: {m_factors}")
