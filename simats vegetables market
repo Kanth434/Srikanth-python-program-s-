@@ -1,0 +1,127 @@
+from tkinter import Tk, font, Label, Entry, Button, Listbox, Scrollbar, messagebox
+
+class Customer:
+    def __init__(self, name, phone):
+        self.name = name
+        self.phone = phone
+        self.tokens = []
+        self.purchased_items = []
+
+    def add_token(self, token):
+        self.tokens.append(token)
+
+    def add_purchased_item(self, item):
+        self.purchased_items.append(item)
+
+    def __str__(self):
+        return f'Customer: {self.name}, Phone: {self.phone}, Tokens: {self.tokens}, Purchased Items: {self.purchased_items}'
+
+class SalesSystem:
+    def __init__(self):
+        self.customers = {}
+        self.token_counter = 1
+        self.vegetables = ["Tomato", "Potato", "Carrot", "Cucumber", "Lettuce", "Onion", "Bell Pepper", "Broccoli"]
+
+    def register_customer(self, name, phone):
+        if phone not in self.customers:
+            self.customers[phone] = Customer(name, phone)
+            messagebox.showinfo("Registration", f'Customer {name} registered successfully.')
+        else:
+            messagebox.showwarning("Registration", f'Customer with phone {phone} already exists.')
+
+    def generate_token(self):
+        token = f"TOKEN-{self.token_counter}"
+        self.token_counter += 1
+        return token
+
+    def new_sale(self, name, vegetable):
+        for customer in self.customers.values():
+            if customer.name == name:
+                token = self.generate_token()
+                customer.add_token(token)
+                customer.add_purchased_item(vegetable)
+                messagebox.showinfo("Sale", f'Sale recorded. Token issued: {token}')
+                self.notify_customer(name, vegetable)
+                return
+        messagebox.showerror("Sale", f'No customer with name {name} found.')
+
+    def notify_customer(self, name, vegetable):
+        for customer in self.customers.values():
+            if customer.name == name:
+                messagebox.showinfo("Notification", f'Thank you for your purchase, {customer.name}! Your token is: {customer.tokens[-1]}. You purchased {vegetable}.')
+                return
+        messagebox.showerror("Notification", f'No customer with name {name} found.')
+
+    def get_customer_info(self, name):
+        for customer in self.customers.values():
+            if customer.name == name:
+                return str(customer)
+        return f'No customer with name {name} found.'
+
+def register_customer_gui():
+    name = name_entry.get()
+    phone = phone_entry.get()
+    if name and phone:
+        system.register_customer(name, phone)
+    else:
+        messagebox.showwarning("Input Error", "Please enter both name and phone number.")
+
+def new_sale_gui():
+    name = sale_name_entry.get()
+    vegetable = sale_vegetable_listbox.get(sale_vegetable_listbox.curselection())
+    if name and vegetable:
+        system.new_sale(name, vegetable)
+    else:
+        messagebox.showwarning("Input Error", "Please enter both name and select a vegetable.")
+
+def get_customer_info_gui():
+    name = info_name_entry.get()
+    if name:
+        info = system.get_customer_info(name)
+        messagebox.showinfo("Customer Info", info)
+    else:
+        messagebox.showwarning("Input Error", "Please enter a name.")
+
+if __name__ == "__main__":
+    system = SalesSystem()
+
+    # Initialize Tkinter
+    root = Tk()
+    root.title("Simat's Vegetables Market")  # Change the title
+
+    # Font configuration
+    app_font = font.Font(size=12)
+
+    # Customer Registration
+    Label(root, text="Register Customer", font=app_font).grid(row=0, column=0, columnspan=2, pady=10)
+    Label(root, text="Name:", font=app_font).grid(row=1, column=0, sticky='e')
+    name_entry = Entry(root, font=app_font)
+    name_entry.grid(row=1, column=1, padx=10, pady=5)
+    Label(root, text="Phone:", font=app_font).grid(row=2, column=0, sticky='e')
+    phone_entry = Entry(root, font=app_font)
+    phone_entry.grid(row=2, column=1, padx=10, pady=5)
+    Button(root, text="Register", font=app_font, command=register_customer_gui).grid(row=3, column=0, columnspan=2, pady=10)
+
+    # Record Sale
+    Label(root, text="Record Sale", font=app_font).grid(row=4, column=0, columnspan=2, pady=10)
+    Label(root, text="Customer Name:", font=app_font).grid(row=5, column=0, sticky='e')
+    sale_name_entry = Entry(root, font=app_font)
+    sale_name_entry.grid(row=5, column=1, padx=10, pady=5)
+    Label(root, text="Select Vegetable:", font=app_font).grid(row=6, column=0, sticky='e')
+    sale_vegetable_listbox = Listbox(root, font=app_font, selectmode="SINGLE")
+    sale_vegetable_listbox.grid(row=6, column=1, padx=10, pady=5)
+    scrollbar = Scrollbar(root, orient="vertical", command=sale_vegetable_listbox.yview)
+    scrollbar.grid(row=6, column=2, sticky="ns")
+    sale_vegetable_listbox.config(yscrollcommand=scrollbar.set)
+    for vegetable in system.vegetables:
+        sale_vegetable_listbox.insert("end", vegetable)
+    Button(root, text="New Sale", font=app_font, command=new_sale_gui).grid(row=7, column=0, columnspan=2, pady=10)
+
+    # Get Customer Info
+    Label(root, text="Get Customer Info", font=app_font).grid(row=8, column=0, columnspan=2, pady=10)
+    Label(root, text="Customer Name:", font=app_font).grid(row=9, column=0, sticky='e')
+    info_name_entry = Entry(root, font=app_font)
+    info_name_entry.grid(row=9, column=1, padx=10, pady=5)
+    Button(root, text="Get Info", font=app_font, command=get_customer_info_gui).grid(row=10, column=0, columnspan=2, pady=10)
+
+    root.mainloop()
